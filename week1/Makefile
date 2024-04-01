@@ -1,7 +1,3 @@
-SUBDIRS = week1
-
-.PHONY: all format lint test run release rust-version
-
 rust-version:
 	@echo "Rust command-line utility versions:"
 	rustc --version 			#rust compiler
@@ -10,20 +6,19 @@ rust-version:
 	rustup --version			#rust toolchain manager
 	clippy-driver --version		#rust linter
 
+format:
+	cargo fmt --quiet
 
-$(SUBDIRS):
-    $(MAKE) -C $@ $(MAKECMDGOALS)
+lint:
+	cargo clippy --quiet
 
-clean: $(SUBDIRS)
+test:
+	cargo test --quiet
 
-format: $(SUBDIRS)
+run:
+	cargo run
 
-lint: $(SUBDIRS)
+release:
+	cargo build --release
 
-test: $(SUBDIRS)
-
-builD: $(SUBDIRS)
-
-release: $(SUBDIRS)
-
-all: format lint test release
+all: format lint test run
