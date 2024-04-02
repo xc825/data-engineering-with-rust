@@ -1,4 +1,4 @@
-SUBDIRS = module1
+SUBDIRS = abc
 
 .PHONY: all format lint test buld release $(SUBDIRS)
 

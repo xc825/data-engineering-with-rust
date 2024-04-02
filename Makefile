@@ -1,6 +1,6 @@
 SUBDIRS = week1
 
-.PHONY: all format lint test run release rust-version
+.PHONY: all format lint test run release rust-version $(SUBDIRS)
 
 rust-version:
 	@echo "Rust command-line utility versions:"
@@ -10,20 +10,7 @@ rust-version:
 	rustup --version			#rust toolchain manager
 	clippy-driver --version		#rust linter
 
-
 $(SUBDIRS):
-    $(MAKE) -C $@ $(MAKECMDGOALS)
+	$(MAKE) -C $@ $(MAKECMDGOALS)
 
-clean: $(SUBDIRS)
-
-format: $(SUBDIRS)
-
-lint: $(SUBDIRS)
-
-test: $(SUBDIRS)
-
-builD: $(SUBDIRS)
-
-release: $(SUBDIRS)
-
-all: format lint test release
+clean format lint test build release all: $(SUBDIRS)
