@@ -1,3 +1,4 @@
+#[allow(clippy::too_many_arguments)]
 fn function_with_ten_parameters(
     param1: i32,
     param2: i32,

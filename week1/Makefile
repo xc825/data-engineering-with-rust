@@ -1,4 +1,4 @@
-SUBDIRS = module1
+SUBDIRS = module1 vector-fruit-salad
 
 .PHONY: all format lint test buld release $(SUBDIRS)
 
