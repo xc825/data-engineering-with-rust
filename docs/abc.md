@@ -10,4 +10,4 @@
 
 ## Documentation
 
-- [index.md](./docs/index.md)
+- [index.md](./index.md)

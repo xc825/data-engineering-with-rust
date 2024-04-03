@@ -12,4 +12,4 @@
 
 ## Documentation
 
-- [ABC Package Documentation](./docs/abc.md)
+- [ABC Package Documentation](./abc.md)
