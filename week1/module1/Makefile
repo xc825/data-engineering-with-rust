@@ -1,6 +1,6 @@
 SUBDIRS = abc
 
-.PHONY: all format lint test buld release $(SUBDIRS)
+.PHONY: all format lint test build release $(SUBDIRS)
 
 $(SUBDIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
