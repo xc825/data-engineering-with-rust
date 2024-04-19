@@ -1,7 +1,7 @@
+use csv::ReaderBuilder;
 use std::error::Error;
 use std::fs::File;
 use std::path::Path;
-use csv::ReaderBuilder;
 
 fn read_csv(file_path: &str) -> Result<Vec<f64>, Box<dyn Error>> {
     let file = File::open(&Path::new(file_path))?;
@@ -27,11 +27,17 @@ fn mean(numbers: &Vec<f64>) -> f64 {
 }
 
 fn min(numbers: &Vec<f64>) -> f64 {
-    *numbers.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap()
+    *numbers
+        .iter()
+        .min_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap()
 }
 
 fn max(numbers: &Vec<f64>) -> f64 {
-    *numbers.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap()
+    *numbers
+        .iter()
+        .max_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap()
 }
 
 fn printout(numbers: &Vec<f64>) {
