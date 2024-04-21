@@ -7,16 +7,17 @@ fn main() {
     let data = Arc::new(Mutex::new(vec![1, 2, 3]));
     let mut handles = vec![];
 
-    for i in 0..100 {
+    for i in 0..20 {
         let data = Arc::clone(&data);
         let handle = thread::spawn(move || {
-            let mut data = data.lock().unwrap();
             println!("Thread {} started", i);
+            let mut data = data.lock().unwrap();
             println!("Thread {} got lock", i);
             println!("Thread {} data[{}]:{} -> {}", i, i%3, data[i%3], &data[i%3]+1);
             data[&i%3] += 1;
             sleep(Duration::from_millis(10));
         });
+        println!("Thread {} spawned", i);
         handles.push(handle);
     }
 
