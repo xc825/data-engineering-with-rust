@@ -1,15 +1,30 @@
+use std::sync::{Arc, Mutex};
 use std::thread;
+use std::thread::sleep;
+use std::time::Duration;
 
 fn main() {
-    let mut data = vec![1, 2, 3];
+    let data = Arc::new(Mutex::new(vec![1, 2, 3]));
+    let mut handles = vec![];
 
-    for i in 0..3 {
-        // Try to capture a mutable reference in multiple threads
-        // This will fail to compile!
-        thread::spawn(move || {
-            data[i] += 1;
+    for i in 0..100 {
+        let data = Arc::clone(&data);
+        let handle = thread::spawn(move || {
+            let mut data = data.lock().unwrap();
+            println!("Thread {} started", i);
+            println!("Thread {} got lock", i);
+            println!("Thread {} data[{}]:{} -> {}", i, i%3, data[i%3], &data[i%3]+1);
+            data[&i%3] += 1;
+            sleep(Duration::from_millis(10));
         });
+        handles.push(handle);
     }
 
-    // No data race can occur, this will not compile.
+    for (i, handle) in handles.into_iter().enumerate() {
+        handle.join().unwrap();
+        println!("Thread {} finished", i);
+    }
+
+    println!("{:?}", data);
+
 }
