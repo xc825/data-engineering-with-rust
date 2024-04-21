@@ -1,4 +1,4 @@
-SUBDIRS = fruit_vector_lab
+SUBDIRS = fruit_vector_lab mutex_lab
 
 .PHONY: all format lint test build release $(SUBDIRS)
 
