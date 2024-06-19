@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "week1/csv",
+    "week1/vector-fruit-salad",
+    "week1/module1/abc",
+    "week2/fruit_vector_lab",
+    "week2/mutex_lab",
+    "week2/dining-philosopher"
+]
