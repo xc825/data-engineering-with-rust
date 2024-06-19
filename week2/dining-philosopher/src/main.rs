@@ -46,24 +46,6 @@ impl Forks {
             condvar: Condvar::new(),
         }
     }
-
-    fn get_two_forks(&mut self) -> Option<(Fork, Fork)> {
-        if self.free_forks.len() < 2 {
-            return None;
-        }
-        let left_fork = self.free_forks.pop().unwrap();
-        let right_fork = self.free_forks.pop().unwrap();
-        self.busy_forks.push(left_fork.clone());
-        self.busy_forks.push(right_fork.clone());
-        Some((left_fork, right_fork))
-    }
-
-    fn put_both_forks(&mut self, left_fork: Fork, right_fork: Fork) {
-        self.free_forks.push(left_fork);
-        self.free_forks.push(right_fork);
-        self.busy_forks
-            .retain(|f| f.id != left_fork.id && f.id != right_fork.id);
-    }
 }
 
 struct Philosopher {
@@ -83,36 +65,55 @@ impl Philosopher {
         }
     }
 
-    fn eat(&self, forks: Arc<Mutex<Forks>>) {
+    fn get_two_forks(&mut self, forks: Arc<Mutex<Forks>>) -> Result<(), &'static str>{
         let mut forks = forks.lock().unwrap();
-        let two_forks = forks.clone().get_two_forks();
-        let (left_fork, right_fork) = match two_forks {
-            Some((fork1, fork2)) => (fork1, fork2),
-            None => {
-                println!("Philosopher {} can't eat, not enough forks", self.id);
-                return;
-            }
-        };
-        println!("Philosopher {} is eating", self.id);
-        thread::sleep(Duration::from_secs(3));
-        forks.put_both_forks(left_fork, right_fork);
-        println!("Philosopher {} is done eating", self.id);
-        forks.condvar.notify_one();
+        if forks.free_forks.len() < 2 {
+            Err("Not enough forks")
+        } else {
+            self.left_fork = Some(forks.free_forks.pop().unwrap().clone());
+            self.right_fork = Some(forks.free_forks.pop().unwrap().clone());
+            forks.busy_forks.push(self.left_fork.unwrap().clone());
+            forks.busy_forks.push(self.right_fork.unwrap().clone());
+            Ok(())
+        }
+    }
+
+    fn put_both_forks(&mut self, forks: Arc<Mutex<Forks>>) {
+        let mut forks = forks.lock().unwrap();
+        forks.free_forks.push(self.left_fork.unwrap());
+        forks.free_forks.push(self.right_fork.unwrap());
+        forks.busy_forks.retain(|f| f.id != self.left_fork.unwrap().id && f.id != self.right_fork.unwrap().id);
+    }
+
+    fn eat(&mut self, forks: Arc<Mutex<Forks>>) {
+        if self.get_two_forks(forks.clone()).is_err() {
+            println!("Philosopher {} is hungry", self.id);
+        }
+        else {
+            println!("Philosopher {} is eating with forks {}, {}",
+            self.id,
+            self.left_fork.unwrap().id,
+            self.right_fork.unwrap().id);
+            thread::sleep(Duration::from_secs(2));
+            self.put_both_forks(forks.clone());
+            println!("Philosopher {} is done eating", self.id);
+        }
+        //forks.condvar.notify_one();
     }
 }
 
 fn main() {
     let forks = Arc::new(Mutex::new(Forks::new(5)));
     let philosophers = vec![
-        Philosopher::new(0, "Aristotle"),
-        Philosopher::new(1, "Plato"),
-        Philosopher::new(2, "Socrates"),
+        Philosopher::new(0, "Aristotle "),
+        Philosopher::new(1, "Plato     "),
+        Philosopher::new(2, "Socrates  "),
         Philosopher::new(3, "Pythagoras"),
         Philosopher::new(4, "Heraclitus"),
     ];
     let handles: Vec<_> = philosophers
         .into_iter()
-        .map(|p| {
+        .map(|mut p| {
             let forks = Arc::clone(&forks);
             thread::spawn(move || {
                 p.eat(forks);
