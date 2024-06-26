@@ -86,17 +86,24 @@ impl Philosopher {
     }
 
     fn eat(&mut self, forks: Arc<Mutex<Forks>>) {
-        if self.get_two_forks(forks.clone()).is_err() {
+        let mut res = Err("Not enough forks");
+        while res.is_err() {
+            res = self.get_two_forks(forks.clone());
             println!("Philosopher {} is hungry", self.id);
         }
-        else {
-            println!("Philosopher {} is eating with forks {}, {}",
-            self.id,
-            self.left_fork.unwrap().id,
-            self.right_fork.unwrap().id);
-            thread::sleep(Duration::from_secs(2));
-            self.put_both_forks(forks.clone());
-            println!("Philosopher {} is done eating", self.id);
+        match res {
+            Ok(_) => {
+                println!("Philosopher {} is eating with forks {}, {}",
+                self.id,
+                self.left_fork.unwrap().id,
+                self.right_fork.unwrap().id);
+                thread::sleep(Duration::from_secs(2));
+                self.put_both_forks(forks.clone());
+                println!("Philosopher {} is done eating", self.id);
+            },
+            Err(err) => {
+                println!("Philosopher {} is hungry, Err:{}", self.id, err);
+            }
         }
         //forks.condvar.notify_one();
     }
